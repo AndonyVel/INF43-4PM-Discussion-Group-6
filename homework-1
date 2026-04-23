@@ -1,4 +1,4 @@
-Title: Sports Everywhere
+Title: SportsZone
   Group Members: Andony Velasquez Carrillo, Kevin Yao (kyao11), Ulises Reyes (ureyes2), Daniel Arutti
 
 
@@ -9,7 +9,13 @@ because everyone is constantly busy, has something to do, or just can’t find t
 If the user only has time on specific days, they should be able to find a time to have fun, without worrying about 
 people to do it with.
   Our app aims to get rid of all the texting, schedule planning, finding available times, and anything that is not
-the fun activity itself. 
+the fun activity itself. To do this, we want to create an app that allows users to find people to play with based on
+a sport, the distance between them, skill level, and, most importantly, time availability. Users simply create a profile, filter
+the sport(s) they want to play, how far they're willing to travel, and the time that they're available. The app automatically
+matches them to people with the same filters. 
+  The target audience that we want to impact is simple recreational sports players who just want to find people to play with, while
+also not struggling to find the time to do so. Whether it's a college student with three hours between their classes or a parent who
+wants to play a simple game of basketball, SportsZone provides the platform to do so. 
 
 
 Application Context/ Environmental Constraints: 
@@ -22,7 +28,7 @@ quickly update everyone’s live location and systems to handle user logins and 
 
 Functional Requirements: 2 people
 Suggested Features (5 minimum)
-Closed set of developer defined interests (sport categories and maybe skill level)
+Closed set of developer-defined interests (sport categories and maybe skill level)
 Basic flow use case: Users select a category for a game they want to play and find people nearby subscribed to the category who’d want to play.
 Alternative flow use case: Users select random categories and don’t use it to sort games they want.
 Exceptional flow use case: Users don’t subscribe to a category and ignore the feature entirely.
