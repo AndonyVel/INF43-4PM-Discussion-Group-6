@@ -1,3 +1,5 @@
+Deliverable: What to Turn In
+
 S1 -- Architectural Summary - Paragraph: comments, connectors, design styles, and where each
   runs (laptop, server, cloud).
 
