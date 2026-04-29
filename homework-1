@@ -1,9 +1,9 @@
-Title: SportsZone
-  Group Members: Andony Velasquez Carrillo, Kevin Yao (kyao11), Ulises Reyes (ureyes2), Daniel Arutti
+#Title: SportsZone
+###Group Members: Andony Velasquez Carrillo, Kevin Yao (kyao11), Ulises Reyes (ureyes2), Daniel Arutti
 
 
-Execute Review: 1 person:
-  A lot of modern-day sports require at least one other person. Basketball, Soccer, Baseball, Tennis, etc., can
+##Execute Review:
+A lot of modern-day sports require at least one other person. Basketball, Soccer, Baseball, Tennis, etc., can
 all somehow be played alone, but it is not the same. Finding a person or people to play with may be hard at times
 because everyone is constantly busy, has something to do, or just can’t find the time to do an activity they love.
 If the user only has time on specific days, they should be able to find a time to have fun, without worrying about 
