@@ -21,11 +21,7 @@ wants to play a simple game of basketball, SportsZone provides the platform to d
 
 
 ## Application Context/ Environmental Constraints
-The application is a mobile platform running on iOS and Android smartphones. It is used in sports facilities such 
-as parks, basketball courts, and tennis courts. The application needs permission from users to constantly check the
-phone’s GPS, use data, and send push notifications, even if it is running in the background. The application requires
-external mapping services, such as Google Maps, to display users’ locations. It also needs strong cloud services to
-quickly update everyone’s live location and systems to handle user logins and alerts.  
+The SportsZone application is a mobile platform for iOS and Android designed for active use in real-world environments like public parks, outdoor courts, and indoor recreation centers. The application needs permission from users to constantly check the phone’s GPS, use data, and send push notifications, even if it is running in the background. The system depends on third-party mapping APIs, such as Google Maps, for location rendering and spatial calculations, paired with a robust cloud backend to instantly synchronize live user availability and chat messages.  
 
 
 ## Functional Requirements
