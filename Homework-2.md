@@ -1,20 +1,3 @@
-Deliverable: What to Turn In
-
-S1 -- Architectural Summary - Paragraph: comments, connectors, design styles, and where each
-  runs (laptop, server, cloud).
-
-S2 + S3 -- Platforms & Languages - Hardware/OS/runtime + languages, with benefit/tradeoff 
-  analysis for each choice/
-
-S4 -- Communication Protocols - What messages flow between components and how (HTTP, RPC,
-  sockets, etc.).
-
-S5 -- Component Functions + Connector Examples - For each use-case flow: function names + 
-  data passed across each connector.
-
-S6 -- Prototype + Reflection - Stub client + server (faked is fine) + a short reflection on what 
-  you learned
-
 # SportsZone — Architectural Documentation
 
 ## Sections S1 – S5
@@ -185,3 +168,9 @@ When the app is backgrounded or closed, the API server publishes a notification 
 | 3 | Cloud Firestore | `activities.where('participants','array-contains',uid).orderBy('date','desc').limit(20)` | Returns `[ { activityId, sport, date, location, participants[] } ]` |
 | 4 | React Native App | `HistoryScreen.renderHistory()` | Renders list; tap on entry shows participant profiles + 'Play Again?' button |
 | 5 | React Native App | `ChatScreen.openThread(existingMatchId)` | Re-opens Socket.io room for that match thread |
+
+---
+
+## S6 — Prototype Reflection
+
+Among the biggest challenges we thought we would face in making the prototype, maintaining high-coupling and low-cohesion was surprisingly on the easier side. This was completely due to the planning and documentation that went into stages 1 through 5. Having a proper sketch/idea of what everything should do and how they should be connected made it incredibly easier to make unplanned changes. This prevented us from deleting a bunch of code that would typically take several hours to write at the minimum. We also found that it was easier to divide up work and make sure every team member didn't struggle with not knowing what else to work on. As for the harsher challenges, working with communication protocols is definitely up there. There were numerous different things to figure out, like APIs, peer-to-peer connection, and managing data storage, that none of us had great expertise on. But ultimately, working on the prototype has served a good purpose. We have a clear vision of the final design, and the prototype helped carve the path to it.
