@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>SportsZone · Find your game</title>
+<meta name="viewport" content="width=1440" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style id="theme">
+  :root {
+    --bg:        #0a0d12;
+    --bg-2:      #0e1218;
+    --surface:   #141a22;
+    --surface-2: #1a2230;
+    --line:      #232b3a;
+    --line-2:    #2e394d;
+    --text:      #e9eef5;
+    --text-2:    #a7b1c0;
+    --muted:     #6c7585;
+    --accent:    #b8ff3d;     /* electric court lime */
+    --accent-2:  #6e8cff;     /* lane blue */
+    --warn:      #ffb84d;
+    --ok:        #6ee7a0;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  /* hide horizontal scrollbars inside the phone */
+  .no-bar { scrollbar-width: none; }
+  .no-bar::-webkit-scrollbar { display: none; }
+  /* prototype layout collapses to single column on narrow viewports */
+  @media (max-width: 1100px) {
+    .proto-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+    .proto-grid > aside { max-width: 720px; margin: 0 auto; width: 100%; }
+    .proto-grid > div { justify-self: center; }
+    .proto-grid > aside:last-child > div { position: static !important; }
+  }
+  .mono   { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  .serif  { font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; }
+  ::selection { background: var(--accent); color: #0a0d12; }
+
+  /* faint grain so the dark doesn't feel flat */
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 100;
+    background-image: radial-gradient(rgba(255,255,255,0.022) 1px, transparent 1px);
+    background-size: 3px 3px; mix-blend-mode: overlay; opacity: 0.5;
+  }
+
+  /* the field-line texture on the hero */
+  .field-bg {
+    background:
+      radial-gradient(70% 60% at 50% 0%, rgba(184,255,61,0.10), transparent 60%),
+      radial-gradient(60% 40% at 80% 80%, rgba(110,140,255,0.08), transparent 60%),
+      var(--bg);
+    position: relative; overflow: hidden;
+  }
+  .field-bg::after {
+    content: ""; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(to right, rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(circle at 50% 40%, black 0%, transparent 75%);
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" data-presets="react" src="tweaks-panel.jsx?v=2"></script>
+  <script type="text/babel" data-presets="react" src="ios-frame.jsx?v=2"></script>
+  <script type="text/babel" data-presets="react" src="components.jsx?v=2"></script>
+  <script type="text/babel" data-presets="react" src="data.jsx?v=2"></script>
+  <script type="text/babel" data-presets="react" src="phone.jsx?v=2"></script>
+  <script type="text/babel" data-presets="react" src="app.jsx?v=2"></script>
+</body>
+</html>
