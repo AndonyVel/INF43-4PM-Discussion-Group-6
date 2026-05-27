@@ -9,6 +9,7 @@ For the first-ever prototype, we wanted to get a general idea of what the main s
 ### Prototype 2 - Computer Design Model
 <img width="512" height="263" alt="image" src="https://github.com/user-attachments/assets/d0e2a953-3268-4291-92e1-04caf0835c80" />
 
+For our second version, we wanted to get a feel of what every page would look like and how we would be swapping between them. We changed some UI designs (some of which we ultimately decided to switch back for our finalized design) and added placeholder squares for icons and images. One of the biggest things we added in this design but decided against afterwards was the home screen. We want our app users to easily see new available games in their area once they open the app, not be faced with some title and then have to press buttons to go somewhere. Because of this we felt that this screen serves no purpose. Additionally, we combined messages and history in one tab at the bottom, but because both of these features feel relatively important we decided to separate them back. With changing the rest of the kept features here into the final design, Claude helped make things look sleek and consistent while keeping the general info we thought should be shown.
 
 ### Prototype 3 - Claude Design Model 
 <table>
