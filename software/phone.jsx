@@ -12,24 +12,48 @@ const DEFAULT_FILTERS = {
   availability: "Any",
 };
 
+/* ── map helpers ── */
+const USER_COORDS = [33.6405, -117.8443]; // UCI area
+
+const COURT_COORDS = {
+  "ARC Court 3":   [33.6486, -117.8425],
+  "Aldrich Park":  [33.6459, -117.8428],
+  "Heritage Park": [33.6608, -117.8284],
+};
+
+function coordsFor(playerId, distanceMi) {
+  let hash = 0;
+  for (let i = 0; i < playerId.length; i++) hash = (hash * 31 + playerId.charCodeAt(i)) & 0xffff;
+  const angle = (hash / 0xffff) * Math.PI * 2;
+  const latOff = Math.sin(angle) * (distanceMi / 69);
+  const lngOff = Math.cos(angle) * (distanceMi / (69 * Math.cos(USER_COORDS[0] * Math.PI / 180)));
+  return [USER_COORDS[0] + latOff, USER_COORDS[1] + lngOff];
+}
+
 /* ───────────────────────────  PHONE  ─────────────────────────── */
 
 function Phone({ screen, setScreen, selected, setSelected, accent }) {
-  const [filters, setFilters] = usePhoneState(DEFAULT_FILTERS);
+  const [filters, setFilters]       = usePhoneState(DEFAULT_FILTERS);
+  const [planDetails, setPlanDetails] = usePhoneState(null);
 
-  const applyFilters = (f) => { if (f) setFilters(f); setScreen("discover"); };
-  const handleAgain  = (id) => { const p = personOf(id); if (p) { setSelected(p); setScreen("match"); } };
+  const applyFilters  = (f) => { if (f) setFilters(f); setScreen("discover"); };
+  const handleAgain   = (id) => { const p = personOf(id); if (p) { setSelected(p); setScreen("match"); } };
+  const handleViewMap = (d) => { setPlanDetails(d); setScreen("map"); };
+
+  const person = selected || PEOPLE[1];
 
   let body;
   switch (screen) {
-    case "onboard":  body = <ScreenOnboard  accent={accent} onContinue={() => setScreen("discover")} />; break;
-    case "filters":  body = <ScreenFilters  accent={accent} filters={filters} onDone={applyFilters} />; break;
-    case "match":    body = <ScreenMatch    accent={accent} person={selected || PEOPLE[1]} onChat={() => setScreen("chat")} onPlan={() => setScreen("plan")} onBack={() => setScreen("discover")} />; break;
-    case "chat":     body = <ScreenChat     accent={accent} person={selected || PEOPLE[1]} onBack={() => setScreen("match")} onPlan={() => setScreen("plan")} />; break;
-    case "plan":     body = <ScreenPlan     accent={accent} person={selected || PEOPLE[1]} onBack={() => setScreen("chat")} onConfirm={() => setScreen("chat")} />; break;
-    case "profile":  body = <ScreenProfile  accent={accent} />; break;
-    case "history":  body = <ScreenHistory  accent={accent} onAgain={handleAgain} />; break;
-    default:         body = <ScreenDiscover accent={accent} filters={filters} onOpenFilters={() => setScreen("filters")} onPick={(p) => { setSelected(p); setScreen("match"); }} />;
+    case "onboard":       body = <ScreenOnboard       accent={accent} onContinue={() => setScreen("discover")} />; break;
+    case "filters":       body = <ScreenFilters        accent={accent} filters={filters} onDone={applyFilters} />; break;
+    case "match":         body = <ScreenMatch          accent={accent} person={person} onChat={() => setScreen("chat")} onPlan={() => setScreen("plan")} onBack={() => setScreen("discover")} />; break;
+    case "chat":          body = <ScreenChat           accent={accent} person={person} onBack={() => setScreen("match")} onPlan={() => setScreen("plan")} />; break;
+    case "plan":          body = <ScreenPlan           accent={accent} person={person} onBack={() => setScreen("chat")} onConfirm={() => setScreen("chat")} onViewMap={handleViewMap} />; break;
+    case "map":           body = <ScreenMap            accent={accent} person={person} planDetails={planDetails || { court: "ARC Court 3", time: "8 PM" }} onBack={() => setScreen("plan")} onShareLocation={() => setScreen("sharelocation")} />; break;
+    case "sharelocation": body = <ScreenShareLocation  accent={accent} person={person} onBack={() => setScreen("map")} />; break;
+    case "profile":       body = <ScreenProfile        accent={accent} />; break;
+    case "history":       body = <ScreenHistory        accent={accent} onAgain={handleAgain} />; break;
+    default:              body = <ScreenDiscover       accent={accent} filters={filters} onOpenFilters={() => setScreen("filters")} onPick={(p) => { setSelected(p); setScreen("match"); }} />;
   }
 
   const showTabs    = ["discover", "profile", "history"].includes(screen);
@@ -487,7 +511,7 @@ function ScreenChat({ accent, person, onBack, onPlan }) {
 
 /* ───────────────────────────  SCREEN: PLAN MEETUP  ─────────────────────────── */
 
-function ScreenPlan({ accent, person, onBack, onConfirm }) {
+function ScreenPlan({ accent, person, onBack, onConfirm, onViewMap }) {
   const [time, setTime]       = usePhoneState("8 PM");
   const [court, setCourt]     = usePhoneState("ARC Court 3");
   const [duration, setDuration] = usePhoneState("1h");
@@ -511,14 +535,20 @@ function ScreenPlan({ accent, person, onBack, onConfirm }) {
           </svg>
         </div>
         <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>Proposal sent!</div>
-        <div style={{ fontSize: 13.5, color: "rgba(255,255,255,0.6)", lineHeight: 1.65, marginBottom: 32 }}>
+        <div style={{ fontSize: 13.5, color: "rgba(255,255,255,0.6)", lineHeight: 1.65, marginBottom: 28 }}>
           {person.name.split(" ")[0]} will see your request for<br />
           <span style={{ color: "#fff", fontWeight: 600 }}>{time}</span> at <span style={{ color: "#fff", fontWeight: 600 }}>{court}</span>
         </div>
-        <button onClick={onConfirm} style={{
+        <button onClick={() => onViewMap && onViewMap({ time, court, duration })} style={{
           width: "100%", padding: "15px 0", borderRadius: 14,
           background: accent, color: "#0a0d12", border: "none",
-          fontSize: 15, fontWeight: 700, cursor: "pointer",
+          fontSize: 15, fontWeight: 700, cursor: "pointer", marginBottom: 10,
+          display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8,
+        }}>📍 View on Map</button>
+        <button onClick={onConfirm} style={{
+          width: "100%", padding: "13px 0", borderRadius: 14,
+          background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
+          color: "rgba(255,255,255,0.65)", fontSize: 14, fontWeight: 600, cursor: "pointer",
         }}>Back to chat</button>
       </div>
     );
@@ -617,6 +647,212 @@ function PlanSection({ title, children }) {
     <div style={{ marginBottom: 18 }}>
       <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", letterSpacing: 1.2, fontWeight: 600, marginBottom: 10, textTransform: "uppercase" }}>{title}</div>
       {children}
+    </div>
+  );
+}
+
+/* ───────────────────────────  SCREEN: MAP  ─────────────────────────── */
+
+function ScreenMap({ accent, person, planDetails, onBack, onShareLocation }) {
+  const mapDivRef   = usePhoneRef(null);
+  const leafletRef  = usePhoneRef(null);
+
+  usePhoneEffect(() => {
+    if (!mapDivRef.current || leafletRef.current || typeof L === "undefined") return;
+
+    const courtCoords  = COURT_COORDS[planDetails.court] || COURT_COORDS["ARC Court 3"];
+    const playerCoords = coordsFor(person.id, person.distance);
+
+    const map = L.map(mapDivRef.current, { zoomControl: false, attributionControl: false })
+      .setView(courtCoords, 14);
+
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { maxZoom: 19 })
+      .addTo(map);
+
+    /* "You" dot */
+    L.marker(USER_COORDS, {
+      icon: L.divIcon({
+        html: `<div style="width:12px;height:12px;border-radius:50%;background:${accent};border:2px solid #0a0d12;box-shadow:0 0 0 4px ${accent}44;"></div>`,
+        className: "", iconSize: [12, 12], iconAnchor: [6, 6],
+      }),
+    }).addTo(map).bindTooltip("You", { permanent: true, offset: [10, 0], className: "" });
+
+    /* meeting point */
+    L.marker(courtCoords, {
+      icon: L.divIcon({
+        html: `<div style="width:38px;height:38px;border-radius:50%;background:${accent};border:2px solid #0a0d12;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#0a0d12;font-family:'JetBrains Mono',monospace;">${person.initials}</div>`,
+        className: "", iconSize: [38, 38], iconAnchor: [19, 19],
+      }),
+    }).addTo(map);
+
+    /* player fuzzy dot */
+    L.marker(playerCoords, {
+      icon: L.divIcon({
+        html: `<div style="width:9px;height:9px;border-radius:50%;background:${person.color};border:1.5px solid #0a0d12;opacity:0.75;"></div>`,
+        className: "", iconSize: [9, 9], iconAnchor: [4, 4],
+      }),
+    }).addTo(map);
+
+    /* dashed route line */
+    L.polyline([USER_COORDS, courtCoords], {
+      color: accent, weight: 1.5, dashArray: "5,8", opacity: 0.55,
+    }).addTo(map);
+
+    setTimeout(() => map.invalidateSize(), 120);
+    leafletRef.current = map;
+
+    return () => { map.remove(); leafletRef.current = null; };
+  }, []);
+
+  return (
+    <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div style={{ padding: "8px 16px 12px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
+        <button onClick={onBack} style={{ background: "transparent", border: "none", color: "rgba(255,255,255,0.7)", fontSize: 14, cursor: "pointer", padding: 0, display: "inline-flex", alignItems: "center", gap: 6 }}>
+          <PhoneIcons.back size={14} color="rgba(255,255,255,0.7)" /> Back
+        </button>
+        <span style={{ fontSize: 15, fontWeight: 700 }}>Meeting Spot</span>
+        <button onClick={onShareLocation} style={{
+          background: `${accent}1e`, border: `1px solid ${accent}55`,
+          color: accent, padding: "6px 11px", borderRadius: 999,
+          fontSize: 11.5, fontWeight: 700, cursor: "pointer",
+          display: "inline-flex", alignItems: "center", gap: 5,
+        }}>📍 Share</button>
+      </div>
+
+      <div ref={mapDivRef} style={{ flex: 1, position: "relative" }} />
+
+      <div style={{ padding: "14px 16px 16px", background: "rgba(10,13,18,0.96)", borderTop: "1px solid rgba(255,255,255,0.07)", flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{
+            width: 40, height: 40, borderRadius: 12,
+            background: person.color, color: "#0a0d12",
+            fontWeight: 800, fontSize: 13, display: "grid", placeItems: "center",
+            fontFamily: "'JetBrains Mono', monospace", flexShrink: 0,
+          }}>{person.initials}</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 700 }}>{planDetails.court}</div>
+            <div style={{ fontSize: 11.5, color: "rgba(255,255,255,0.55)", marginTop: 2 }}>
+              {planDetails.time} · with {person.name.split(" ")[0]} · {person.distance} mi
+            </div>
+          </div>
+          <button onClick={onShareLocation} style={{
+            background: accent, border: "none", color: "#0a0d12",
+            padding: "9px 13px", borderRadius: 999,
+            fontSize: 12, fontWeight: 700, cursor: "pointer",
+          }}>Share location</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ───────────────────────────  SCREEN: SHARE LOCATION  ─────────────────────────── */
+
+function ScreenShareLocation({ accent, person, onBack }) {
+  const [duration, setDuration] = usePhoneState("1 hour");
+  const [selected, setSelected] = usePhoneState([person.id]);
+  const [shared,   setShared]   = usePhoneState(false);
+
+  const durations = ["30 min", "1 hour", "2 hours", "Until I stop"];
+
+  const toggle = (id) => setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+
+  if (shared) {
+    return (
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 28px", textAlign: "center" }}>
+        <div style={{ fontSize: 52, marginBottom: 16 }}>📍</div>
+        <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>Location shared!</div>
+        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.65, marginBottom: 32 }}>
+          Sharing for <span style={{ color: "#fff", fontWeight: 600 }}>{duration}</span><br />
+          with <span style={{ color: "#fff", fontWeight: 600 }}>{selected.length} {selected.length === 1 ? "person" : "people"}</span>
+        </div>
+        <button onClick={onBack} style={{
+          width: "100%", padding: "15px 0", borderRadius: 14,
+          background: accent, color: "#0a0d12", border: "none",
+          fontSize: 15, fontWeight: 700, cursor: "pointer",
+        }}>Done</button>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div style={{ padding: "8px 20px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
+        <button onClick={onBack} style={{ background: "transparent", border: "none", color: "rgba(255,255,255,0.7)", fontSize: 14, cursor: "pointer", padding: 0 }}>Cancel</button>
+        <span style={{ fontSize: 15, fontWeight: 700 }}>Share Location</span>
+        <span style={{ width: 50 }} />
+      </div>
+
+      <div style={{ flex: 1, overflow: "auto", padding: "16px 20px" }}>
+        <div style={{ marginBottom: 22 }}>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", letterSpacing: 1.2, fontWeight: 600, marginBottom: 10, textTransform: "uppercase" }}>Share for</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8 }}>
+            {durations.map(d => {
+              const on = duration === d;
+              return (
+                <button key={d} onClick={() => setDuration(d)} style={{
+                  padding: "12px 0", borderRadius: 12,
+                  background: on ? `${accent}22` : "rgba(255,255,255,0.04)",
+                  color: on ? accent : "rgba(255,255,255,0.8)",
+                  border: `1px solid ${on ? accent : "rgba(255,255,255,0.08)"}`,
+                  fontSize: 13, fontWeight: 600, cursor: "pointer",
+                }}>{d}</button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", letterSpacing: 1.2, fontWeight: 600, marginBottom: 10, textTransform: "uppercase" }}>Share with</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {PEOPLE.slice(0, 8).map(p => {
+              const on = selected.includes(p.id);
+              return (
+                <button key={p.id} onClick={() => toggle(p.id)} style={{
+                  display: "flex", alignItems: "center", gap: 12,
+                  padding: "10px 12px", borderRadius: 12,
+                  background: on ? `${accent}14` : "rgba(255,255,255,0.03)",
+                  border: `1px solid ${on ? accent : "rgba(255,255,255,0.07)"}`,
+                  cursor: "pointer", textAlign: "left", fontFamily: "inherit",
+                }}>
+                  <div style={{
+                    width: 34, height: 34, borderRadius: 99,
+                    background: p.color, color: "#0a0d12",
+                    fontWeight: 800, fontSize: 11, display: "grid", placeItems: "center",
+                    fontFamily: "'JetBrains Mono', monospace", flexShrink: 0,
+                  }}>{p.initials}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13.5, fontWeight: 600, color: "#fff" }}>{p.name}</div>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>{sportOf(p.sport)?.label} · {p.distance} mi</div>
+                  </div>
+                  <div style={{
+                    width: 20, height: 20, borderRadius: 6, flexShrink: 0,
+                    border: `1.5px solid ${on ? accent : "rgba(255,255,255,0.2)"}`,
+                    background: on ? accent : "transparent",
+                    display: "grid", placeItems: "center",
+                  }}>
+                    {on && <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5L4.5 7.5L8 3" stroke="#0a0d12" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ padding: "12px 20px 16px", flexShrink: 0 }}>
+        <button
+          onClick={() => { if (selected.length > 0) setShared(true); }}
+          style={{
+            width: "100%", padding: "15px 0", borderRadius: 14,
+            background: selected.length > 0 ? accent : "rgba(255,255,255,0.1)",
+            color: selected.length > 0 ? "#0a0d12" : "rgba(255,255,255,0.3)",
+            border: "none", fontSize: 15, fontWeight: 700,
+            cursor: selected.length > 0 ? "pointer" : "default",
+          }}>
+          {selected.length === 0 ? "Select people first" : `Share with ${selected.length} ${selected.length === 1 ? "person" : "people"}`}
+        </button>
+      </div>
     </div>
   );
 }
