@@ -22,7 +22,7 @@ npm install --save-dev jest supertest
 ## 3. Copy the test files into your repo
 
 ```
-your-project/
+software/
 ├── server.js
 ├── package.json
 └── tests/
