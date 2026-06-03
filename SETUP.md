@@ -1,23 +1,12 @@
 # How to wire up the tests
 
-## 1. Add `module.exports = app;` to server.js
-
-At the very bottom of `server.js`, **after** the `app.listen(...)` call, add this one line:
-
-```js
-module.exports = app;
-```
-
-This lets Supertest import the Express app without starting a second server process.
-The existing `app.listen()` call stays in place and works normally when you run `node server.js`.
-
-## 2. Install test dependencies
+## 1. Install test dependencies
 
 ```bash
 npm install --save-dev jest supertest
 ```
 
-## 3. Add test scripts to package.json
+## 2. Add test scripts to package.json
 
 ```json
 "scripts": {
@@ -30,7 +19,7 @@ npm install --save-dev jest supertest
 }
 ```
 
-## 4. Copy the test files into your repo
+## 3. Copy the test files into your repo
 
 ```
 your-project/
@@ -44,7 +33,7 @@ your-project/
         └── chat.test.js
 ```
 
-## 5. Run
+## 4. Run
 
 ```bash
 npm test                  # all tests
