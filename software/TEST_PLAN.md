@@ -238,5 +238,3 @@ A test for `GET /api/players` with an invalid `maxDistance` value (e.g. `?maxDis
 Claude was genuinely useful for scaffolding the initial server structure: the REST route layout, the in-memory data shape, and the injection pattern for bootstrapping the frontend from `window.__SZ_DATA__` were all clean and followed standard Express conventions. It also correctly identified the `[...DEFAULT_CHAT]` spread fix when asked. Where it was less reliable: it initially suggested mocking `fs` with `jest.mock('fs')` for the HTML route test, which works in principle but produced a configuration that conflicted with how Supertest imports the app — it took manual debugging to unwind. Claude's suggestions are good starting points but should be run and verified, not copy-pasted blindly.
 
 ---
-
-*End of TEST_PLAN.md*
