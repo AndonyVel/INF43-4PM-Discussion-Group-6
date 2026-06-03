@@ -286,4 +286,6 @@ app.listen(PORT, () => {
   POST /api/history           log a session
   POST /api/plan              propose a meetup
   `);
+
+  module.exports - app;
 });
